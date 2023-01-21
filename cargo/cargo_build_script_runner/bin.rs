@@ -204,8 +204,6 @@ fn run_buildrs() -> Result<(), String> {
 }
 
 /// Create a symlink from `link` to `original`.
-///
-/// Link must be a directory.
 #[cfg(windows)]
 fn symlink(original: &Path, link: &Path) -> Result<(), String> {
     if original.is_dir() {

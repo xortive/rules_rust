@@ -31,10 +31,26 @@ fn main() {
         })
         .collect::<HashSet<_>>();
 
-    assert!(root_files.take(build_script_name).is_some(), "Build script must be in the current directory");
-    assert!(root_files.take("root_file.txt").is_some(), "'root_file.txt' must be in the current directory");
-    assert!(root_files.take("bazel-out").is_some(), "'bazel-out' must be in the current directory");
-    assert!(root_files.take("external").is_some(), "'external' must be in the current directory");
+    assert!(
+        root_files.take(build_script_name).is_some(),
+        "Build script must be in the current directory"
+    );
+    assert!(
+        root_files.take("root_file.txt").is_some(),
+        "'root_file.txt' must be in the current directory"
+    );
+    assert!(
+        root_files.take("bazel-out").is_some(),
+        "'bazel-out' must be in the current directory"
+    );
+    assert!(
+        root_files.take("external").is_some(),
+        "'external' must be in the current directory"
+    );
 
-    assert!(root_files.is_empty(), "There should not be any other files in the current directory, found {:?}", root_files);
+    assert!(
+        root_files.is_empty(),
+        "There should not be any other files in the current directory, found {:?}",
+        root_files
+    );
 }
