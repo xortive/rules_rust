@@ -48,8 +48,14 @@ fn main() {
         "'external' must be in the current directory"
     );
 
+    let remaining_files = root_files
+        .iter()
+        // An __action_home_<hash> directory is created in some remote execution builds.
+        .filter(|file| !file.starts_with("__action_home"))
+        .collect::<HashSet<_>>();
+
     assert!(
-        root_files.is_empty(),
+        remaining_files.is_empty(),
         "There should not be any other files in the current directory, found {:?}",
         root_files
     );
