@@ -65,24 +65,13 @@ fn run_buildrs() -> Result<(), String> {
                 )
             })?
             .path();
-        let metadata = std::fs::metadata(&path).map_err(|err| {
-            format!(
-                "Failed while getting metadata for path {:?}: {:?}",
-                path, err
-            )
-        })?;
 
-        // Only symlink directories.
-        if !metadata.is_dir() {
-            continue;
-        }
-
-        let dir_name = path
+        let file_name = path
             .file_name()
             .ok_or_else(|| "Failed while getting file name".to_string())?
             .to_str()
             .ok_or_else(|| "Failed while converting file name to string".to_string())?;
-        let link = manifest_dir.join(dir_name);
+        let link = manifest_dir.join(file_name);
 
         // If the link already exists, don't try to create it.
         if link.exists() {
@@ -219,19 +208,20 @@ fn run_buildrs() -> Result<(), String> {
 /// Link must be a directory.
 #[cfg(windows)]
 fn symlink(original: &Path, link: &Path) -> Result<(), String> {
-    if let Err(e) = std::os::windows::fs::symlink_dir(original, link) {
-        return Err(format!("Failed to create symlink: {}", e));
+    if original.is_dir() {
+        std::os::windows::fs::symlink_dir(original, link)
+            .map_err(|e| format!("Failed to create directory symlink: {}", e))
+    } else {
+        std::os::windows::fs::symlink_file(original, link)
+            .map_err(|e| format!("Failed to create file symlink: {}", e))
     }
-    Ok(())
 }
 
 /// Create a symlink from `link` to `original`.
 #[cfg(not(windows))]
 fn symlink(original: &Path, link: &Path) -> Result<(), String> {
-    if let Err(e) = std::os::unix::fs::symlink(original, link) {
-        return Err(format!("Failed to create symlink: {}", e));
-    }
-    Ok(())
+    std::os::unix::fs::symlink(original, link)
+        .map_err(|e| format!("Failed to create symlink: {}", e))
 }
 
 /// A representation of expected command line arguments.
